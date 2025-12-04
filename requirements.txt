@@ -14,5 +14,5 @@ PyYAML
 
 # --- Utilities ---
 requests
-langchian
+langchain
 langchain_community
