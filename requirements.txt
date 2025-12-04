@@ -1,0 +1,16 @@
+# --- Web framework ---
+Flask
+
+# --- CrewAI core ---
+crewai
+
+# --- LLM + Gemini support ---
+litellm
+google-generativeai
+
+# --- Configuration & parsing ---
+python-dotenv
+PyYAML
+
+# --- Utilities ---
+requests
