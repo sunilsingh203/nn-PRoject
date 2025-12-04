@@ -17,3 +17,8 @@ requests
 langchain
 langchain_community
 unstructured
+
+
+crewai[google-genai]
+litellm
+google-generativeai
