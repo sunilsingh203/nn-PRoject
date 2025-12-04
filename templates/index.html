@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Generator - AI Powered</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: white;
+            display: none;
+        }
+
+        .btn-download:hover:not(:disabled) {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status-container.active {
+            display: block;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-text {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #c62828;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #4caf50;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            color: #1565c0;
+        }
+
+        .character-count {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 0.95em;
+            }
+        }
+
+        /* Code Viewer Styles */
+        .code-viewer {
+            display: none;
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .code-viewer.active {
+            display: flex;
+        }
+
+        .code-header {
+            background: #252526;
+            padding: 12px 15px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-selector {
+            flex: 1;
+            padding: 8px 12px;
+            background: #3e3e42;
+            border: none;
+            color: #d4d4d4;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .file-selector:hover {
+            background: #4e4e52;
+        }
+
+        .copy-btn {
+            padding: 8px 15px;
+            background: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #1177bb;
+        }
+
+        .copy-btn.copied {
+            background: #4caf50;
+        }
+
+        .code-content {
+            flex: 1;
+            overflow: auto;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        .code-content pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Syntax highlighting */
+        .code-content {
+            background: #1e1e1e;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 6px 12px;
+            background: #3e3e42;
+            color: #d4d4d4;
+            border: none;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #4e4e52;
+        }
+
+        .tab-btn.active {
+            background: #0e639c;
+            color: white;
+        }
+
+        .close-code-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .close-code-btn:hover {
+            background: #b71c1c;
+        }
+
+        /* Agent Logs Styles */
+        .logs-panel {
+            display: none;
+            flex: 1;
+            background: #0d1117;
+            color: #c9d1d9;
+            overflow: hidden;
+            flex-direction: column;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .logs-panel.active {
+            display: flex;
+        }
+
+        .logs-header {
+            background: #161b22;
+            padding: 12px 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logs-header h3 {
+            margin: 0;
+            font-size: 1em;
+            color: #79c0ff;
+        }
+
+        .logs-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #0d1117;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 3px solid;
+            border-radius: 2px;
+            line-height: 1.4;
+        }
+
+        .log-entry.info {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.05);
+            color: #79c0ff;
+        }
+
+        .log-entry.thinking {
+            border-color: #d29922;
+            background: rgba(210, 153, 34, 0.05);
+            color: #d9ad48;
+        }
+
+        .log-entry.success {
+            border-color: #3fb950;
+            background: rgba(63, 185, 80, 0.05);
+            color: #58a6ff;
+        }
+
+        .log-entry.error {
+            border-color: #f85149;
+            background: rgba(248, 81, 73, 0.05);
+            color: #f85149;
+        }
+
+        .log-timestamp {
+            font-size: 0.8em;
+            opacity: 0.6;
+            margin-right: 8px;
+        }
+
+        .log-agent {
+            font-weight: 600;
+            margin-right: 8px;
+            color: #79c0ff;
+        }
+
+        .log-message {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .close-logs-btn {
+            background: #da3633;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .close-logs-btn:hover {
+            background: #b71c1c;
+        }
+
+        .logs-scroll-indicator {
+            text-align: center;
+            padding: 5px;
+            font-size: 0.8em;
+            opacity: 0.6;
+            color: #79c0ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Landing Page Generator</h1>
+            <p>Create professional landing pages with AI</p>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <strong>ℹ️ How it works:</strong> Describe your landing page idea and our AI will generate a complete 2-page e-commerce website for you!
+            </div>
+
+            <form id="generatorForm">
+                <div class="form-group">
+                    <label for="ideaInput">📝 Describe Your Landing Page Idea</label>
+                    <textarea 
+                        id="ideaInput" 
+                        placeholder="Example: Create a simple 2-page e-commerce website for selling handmade jewelry with product listings and checkout..."
+                        required
+                    ></textarea>
+                    <div class="character-count">
+                        <span id="charCount">0</span> / 2000 characters
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-generate" id="generateBtn">
+                        Generate Landing Page
+                    </button>
+                    <button type="button" class="btn-download" id="downloadBtn">
+                        Download Project
+                    </button>
+                </div>
+            </form>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <div class="status-container" id="statusContainer">
+                <div class="status-title">
+                    <span class="spinner"></span>
+                    <span id="statusText">Starting generation...</span>
+                    <button type="button" class="btn-download" id="watchAgentsBtn" style="margin-left: auto;">
+                        👁️ Watch Agents
+                    </button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="status-text" id="detailText">Please wait, this may take a few minutes...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Logs Panel -->
+    <div class="logs-panel" id="logsPanel">
+        <div class="logs-header">
+            <h3>🤖 Agent Communication</h3>
+            <button class="close-logs-btn" id="closeLogsBtn">✕ Close</button>
+        </div>
+        <div class="logs-content" id="logsContent">
+            <div class="logs-scroll-indicator">Waiting for agent communication...</div>
+        </div>
+    </div>
+
+    <!-- Code Viewer Panel -->
+    <div class="code-viewer" id="codeViewer">
+        <div class="code-header">
+            <select class="file-selector" id="fileSelector">
+                <option value="">Select a file to view...</option>
+            </select>
+            <button class="copy-btn" id="copyBtn">📋 Copy Code</button>
+            <button class="close-code-btn" id="closeCodeBtn">✕ Close</button>
+        </div>
+        <div class="code-content">
+            <pre id="codeContent"></pre>
+        </div>
+
+    <script>
+        const form = document.getElementById('generatorForm');
+        const ideaInput = document.getElementById('ideaInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusContainer = document.getElementById('statusContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+        const detailText = document.getElementById('detailText');
+        const charCount = document.getElementById('charCount');
+
+        // Code viewer elements
+        const codeViewer = document.getElementById('codeViewer');
+        const fileSelector = document.getElementById('fileSelector');
+        const codeContent = document.getElementById('codeContent');
+        const copyBtn = document.getElementById('copyBtn');
+        const closeCodeBtn = document.getElementById('closeCodeBtn');
+
+        // Logs panel elements
+        const logsPanel = document.getElementById('logsPanel');
+        const logsContent = document.getElementById('logsContent');
+        const watchAgentsBtn = document.getElementById('watchAgentsBtn');
+        const closeLogsBtn = document.getElementById('closeLogsBtn');
+
+        let statusCheckInterval = null;
+        let logsCheckInterval = null;
+        let codeFiles = {};
+        let lastLogIndex = 0;
+
+        // Update character count
+        ideaInput.addEventListener('input', (e) => {
+            charCount.textContent = e.target.value.length;
+            if (e.target.value.length > 2000) {
+                e.target.value = e.target.value.substring(0, 2000);
+                charCount.textContent = '2000';
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const idea = ideaInput.value.trim();
+
+            // Clear previous messages
+            errorMessage.classList.remove('active');
+            successMessage.classList.remove('active');
+
+            if (!idea) {
+                showError('Please enter your landing page idea');
+                return;
+            }
+
+            if (idea.length < 5) {
+                showError('Idea must be at least 5 characters long');
+                return;
+            }
+
+            // Disable form
+            generateBtn.disabled = true;
+            ideaInput.disabled = true;
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ idea })
+                });
+
+                if (response.status === 202) {
+                    // Generation started
+                    showStatus('Generation started! This may take 10-45 minutes...');
+                    startStatusChecking();
+                } else {
+                    const data = await response.json();
+                    showError(data.error || 'Failed to start generation');
+                    generateBtn.disabled = false;
+                    ideaInput.disabled = false;
+                }
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+                generateBtn.disabled = false;
+                ideaInput.disabled = false;
+            }
+        });
+
+        function startStatusChecking() {
+            lastLogIndex = 0;  // Reset logs index
+            statusCheckInterval = setInterval(checkStatus, 2000);
+            statusContainer.classList.add('active');
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+
+                progressFill.style.width = status.progress + '%';
+                statusText.textContent = status.status;
+
+                if (status.status === 'completed') {
+                    clearInterval(statusCheckInterval);
+                    statusContainer.classList.remove('active');
+                    
+                    // Keep logs panel open but stop checking
+                    if (logsCheckInterval) {
+                        clearInterval(logsCheckInterval);
+                        logsCheckInterval = null;
+                    }
+                    
+                    downloadBtn.style.display = 'flex';
+                    
+                    // Load code files
+                    await loadCodeFiles();
+                    
+                    generateBtn.disabled = false;
+                    ideaInput.disabled = false;
+                } else if (status.status === 'error') {
+                    clearInterval(statusCheckInterval);
+                    if (logsCheckInterval) {
+                        clearInterval(logsCheckInterval);
+                        logsCheckInterval = null;
+                    }
+                    statusContainer.classList.remove('active');
+                    showError(`Generation failed: ${status.error}`);
+                    generateBtn.disabled = false;
+                    ideaInput.disabled = false;
+                }
+            } catch (error) {
+                console.error('Status check error:', error);
+            }
+        }
+
+        async function loadCodeFiles() {
+            try {
+                const response = await fetch('/api/code');
+                const data = await response.json();
+                
+                if (data.files && Object.keys(data.files).length > 0) {
+                    codeFiles = data.files;
+                    populateFileSelector();
+                    
+                    // Show a button to view code
+                    if (!document.getElementById('viewCodeBtn')) {
+                        const viewCodeBtn = document.createElement('button');
+                        viewCodeBtn.id = 'viewCodeBtn';
+                        viewCodeBtn.type = 'button';
+                        viewCodeBtn.className = 'btn-download';
+                        viewCodeBtn.textContent = '👁️ View Code';
+                        viewCodeBtn.style.display = 'flex';
+                        viewCodeBtn.addEventListener('click', () => {
+                            codeViewer.classList.add('active');
+                            if (fileSelector.options.length > 1) {
+                                fileSelector.selectedIndex = 1;
+                                fileSelector.dispatchEvent(new Event('change'));
+                            }
+                        });
+                        downloadBtn.parentElement.appendChild(viewCodeBtn);
+                    }
+                    showSuccess('Landing page generated! Click "View Code" to preview or "Download Project" to get all files.');
+                } else {
+                    console.warn('No code files found:', data.error);
+                    showSuccess('Landing page generated! Click "Download Project" to get your files.');
+                }
+            } catch (error) {
+                console.error('Error loading code files:', error);
+                showSuccess('Landing page generated! Click "Download Project" to get your files.');
+            }
+        }
+
+        function populateFileSelector() {
+            fileSelector.innerHTML = '<option value="">Select a file to view...</option>';
+            Object.keys(codeFiles).forEach(filename => {
+                const option = document.createElement('option');
+                option.value = filename;
+                option.textContent = filename;
+                fileSelector.appendChild(option);
+            });
+        }
+
+        fileSelector.addEventListener('change', (e) => {
+            const filename = e.target.value;
+            if (filename && codeFiles[filename]) {
+                const fileData = codeFiles[filename];
+                codeContent.textContent = fileData.content;
+                copyBtn.textContent = '📋 Copy Code';
+            }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            const filename = fileSelector.value;
+            if (!filename || !codeFiles[filename]) {
+                showError('Please select a file first');
+                return;
+            }
+
+            const content = codeFiles[filename].content;
+            try {
+                await navigator.clipboard.writeText(content);
+                copyBtn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copy Code';
+                }, 2000);
+            } catch (error) {
+                showError('Failed to copy code');
+                console.error('Copy error:', error);
+            }
+        });
+
+        closeCodeBtn.addEventListener('click', () => {
+            codeViewer.classList.remove('active');
+            fileSelector.value = '';
+            codeContent.textContent = '';
+        });
+
+        watchAgentsBtn.addEventListener('click', () => {
+            logsPanel.classList.add('active');
+            startLogsChecking();
+        });
+
+        closeLogsBtn.addEventListener('click', () => {
+            logsPanel.classList.remove('active');
+            if (logsCheckInterval) {
+                clearInterval(logsCheckInterval);
+                logsCheckInterval = null;
+            }
+        });
+
+        function startLogsChecking() {
+            if (!logsCheckInterval) {
+                logsCheckInterval = setInterval(updateLogs, 1000);
+            }
+        }
+
+        async function updateLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                if (response.ok) {
+                    const data = await response.json();
+                    const logs = data.logs;
+                    
+                    // Add new logs since last check
+                    const newLogs = logs.slice(lastLogIndex);
+                    if (newLogs.length > 0) {
+                        newLogs.forEach(log => {
+                            addLogEntry(log);
+                        });
+                        lastLogIndex = logs.length;
+                        
+                        // Auto scroll to bottom
+                        setTimeout(() => {
+                            logsContent.scrollTop = logsContent.scrollHeight;
+                        }, 100);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+            }
+        }
+
+        function addLogEntry(log) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${log.level}`;
+            
+            const timestamp = new Date(log.timestamp).toLocaleTimeString();
+            
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-agent">${log.agent}:</span>
+                <span class="log-message">${escapeHtml(log.message)}</span>
+            `;
+            
+            logsContent.appendChild(entry);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                downloadBtn.disabled = true;
+                const response = await fetch('/api/download');
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `landing_page_${new Date().getTime()}.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    showError('Failed to download file');
+                }
+            } catch (error) {
+                showError(`Download error: ${error.message}`);
+            } finally {
+                downloadBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.add('active');
+        }
+
+        function showStatus(message) {
+            statusText.textContent = message;
+        }
+    </script>
+</body>
+</html>
