@@ -16,3 +16,4 @@ PyYAML
 requests
 langchain
 langchain_community
+unstructured
